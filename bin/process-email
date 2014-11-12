@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# TODO: Improve function names.
+# TODO: Echo to make things friendly.
+set -e
+
+readonly BASEURL_FILE="baseurl.txt"
+readonly IMAGE_DIR="./images"
+readonly PACKAGE_FILE="$(basename "$(pwd)")"
+
+###############################################################################
+#
+###############################################################################
+usage() {
+  echo "Usage: $(basename "$0") [-p] filename" >&2
+}
+
+###############################################################################
+# Strip out inline styles with "-premailer" prefix.
+#
+# As of premailer 1.8.2, inline styles prefixed with "-premailer" are
+# not removed.
+# Issue: https://github.com/premailer/premailer/issues/173
+###############################################################################
+strip_premailer_prefixed_styles() {
+  sed -E 's/[[:space:]]*-premailer-[a-zA-Z]+:[^;]+;[[:space:]]*//g'
+}
+
+
+###############################################################################
+# Remove "images/" from URL paths.
+#
+# Typically, when emails are hosted, images are siblings of the actual HTML.
+###############################################################################
+remove_image_path() {
+  sed "s|${BASEURL}${IMAGE_DIR}/|${BASEURL}|g"
+}
+
+
+###############################################################################
+#
+###############################################################################
+main() {
+  local baseurl_url
+  local baseurl_opt
+  local create_package
+  local email_file
+  local email_rendered_file
+  local output
+
+  create_package=''
+
+  while getopts 'hp' opt; do
+    case "${opt}" in
+      h)
+        usage
+        exit
+        ;;
+      p)
+        create_package=true
+        ;;
+      *)
+        echo "Unrecognized option ${opt}" >&2
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  baseurl_url=''
+  baseurl_opt=''
+  email_file="$1"
+  email_rendered_file="rendered--${email_file}"
+
+  if [[ $# != 1 ]]; then
+    usage
+    exit 1
+  fi
+
+  if [[ ! -f "${email_file}" ]]; then
+    echo "${email_file} not found, exiting." >&2
+    exit 1
+  fi
+
+  # If the BASEURL_FILE exists, use it as a premailer argument.
+  if [[ -f "${BASEURL_FILE}" ]]; then
+    baseurl_url=$(head "${BASEURL_FILE}")
+    baseurl_opt="--base-url ${baseurl_url}"
+  fi
+
+  # Run premailer
+  # TODO check if premailer returned an error code?
+  output="$(premailer \
+    --remove-classes \
+    --remove-scripts \
+    --io-exceptions \
+    ${baseurl_opt} \
+    "${email_file}" | \
+    strip_premailer_prefixed_styles)"
+
+  # If there is a baseurl and an image directory, replace any image directory
+  # reference to the HTML with the base url.
+  # TODO: Move into function?
+  if [[ -n "${baseurl_url}" && -d ${IMAGE_DIR} ]]; then
+    output=$(echo "${output}" | remove_image_path)
+  fi
+
+  if [[ "${create_package}" == true ]]
+  then
+    echo "${output}" > "${email_rendered_file}"
+    # TODO: Images directory could be empty!
+    zip -j "${PACKAGE_FILE}" "${email_rendered_file}" "${IMAGE_DIR}/*"
+    rm "${email_rendered_file}"
+  else
+    echo "${output}"
+  fi
+}
+main "$@"
