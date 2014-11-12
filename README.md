@@ -1,8 +1,4 @@
-Basic HTML email template
-=========================
+HTML email boilerplate and more
+===============================
 
-Tested on OS X 10.10
-
-Uses ruby for polling, premailer.
-
-
+Tested on OS X 10.10.
