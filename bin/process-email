@@ -80,6 +80,7 @@ main() {
 
   # If the BASEURL_FILE exists, use it as a premailer argument.
   if [[ -n "${baseurl}" ]]; then
+    baseurl="$(echo "${baseurl}" | sed 's|/$||g')"
     baseurl_opt="--base-url ${baseurl}"
   fi
 
@@ -95,7 +96,7 @@ main() {
 
   # If there is a baseurl, replace any image directory link with the base url.
   if [[ -n "${baseurl}" && -d "./${IMAGE_DIR}" ]]; then
-    output=$(echo "${output}" | sed "s|${baseurl}${IMAGE_DIR}/|${baseurl}|g")
+    output=$(echo "${output}" | sed "s|${baseurl}/${IMAGE_DIR}/|${baseurl}/|g")
   fi
 
   # Package up
