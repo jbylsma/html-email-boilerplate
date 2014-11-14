@@ -5,7 +5,7 @@
 set -e
 
 readonly IMAGE_DIR="images"
-readonly PACKAGE_FILE="$(basename "$(pwd)")"
+readonly PACKAGE_FILE="$(basename "$(pwd)").zip"
 
 ###############################################################################
 #
@@ -102,9 +102,15 @@ main() {
   # Package up
   if [[ "${create_package}" == true ]]
   then
+    output="$(echo "${output}" | sed "s|\(src=\"\)${IMAGE_DIR}/|\1|g")"
     echo "${output}" > "${email_rendered_file}"
+
+    if [[ -f "${PACKAGE_FILE}" ]]; then
+      rm "${PACKAGE_FILE}"
+    fi
+
     # TODO: Images directory could be empty!
-    zip -j "${PACKAGE_FILE}" "${email_rendered_file}" "./${IMAGE_DIR}/*"
+    zip -j "${PACKAGE_FILE}" "${email_rendered_file}" "./${IMAGE_DIR}"/*
     rm "${email_rendered_file}"
   else
     echo "${output}"
