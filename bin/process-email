@@ -81,7 +81,7 @@ main() {
   # If the BASEURL_FILE exists, use it as a premailer argument.
   if [[ -n "${baseurl}" ]]; then
     baseurl="$(echo "${baseurl}" | sed 's|/$||g')"
-    baseurl_opt="--base-url ${baseurl}"
+    baseurl_opt="--base-url ${baseurl}/"
   fi
 
   # Run premailer
