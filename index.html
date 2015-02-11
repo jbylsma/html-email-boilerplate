@@ -51,17 +51,74 @@
 </style>
 <style type="text/css">
   /**
-   * Generic global styles
+   * ==========================
+   * CSS resets and base styles
+   * ==========================
    */
   body {
     margin: 0;
     padding: 0;
   }
 
+  strong,
+  strong * {
+    font-weight: 600;
+  }
+
+  em,
+  em * {
+    font-style: italic;
+  }
+
   a {
     text-decoration: underline;
   }
 
+  /**
+   * Images
+   *
+   * Inline images may show a top and bottom margin. Prevent this by
+   * forcing images to be rendered as block elements.
+   */
+  img {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    display: block;
+  }
+
+  /**
+   * Lists
+   *
+   * Lists should not be used in emails; email clients render them
+   * inconsistently. A two-column table should be used instead.
+   *
+   * Unordered lists can be faked with a bullet HTML entity.
+   */
+  ul,
+  ol,
+  dl {
+    display: none;
+  }
+
+  /**
+   * Horizontal rules
+   *
+   * Outlook 2013 renders empty tds with ~15px height. Setting a
+   * font size and line height of 1px prevents this.
+   *
+   * Make sure to define the cell's height and include a &nbsp;.
+   */
+  td.hr {
+    font-size: 1px;
+    line-height: 1px;
+  }
+
+  /**
+   * Tables
+   */
   table {
     margin: 0;
     padding: 0;
@@ -82,21 +139,12 @@
     border: none;
   }
 
-  img {
-    margin: 0;
-    padding: 0;
-    border: none;
-    outline: none;
-    text-decoration: none;
-  }
-
   /**
-   * Images shown inline (not "block," maybe not "inline-block") may show a
-   * margin above and below it. If this isn't desired, use the following class
-   * to disable the behavior.
+   * table.body-wrap
+   *
+   * This element wraps the entire email, and is used to set a
+   * background color.
    */
-  img.block { display: block; }
-
   table.body-wrap {
     margin: 0;
     padding: 0;
@@ -106,79 +154,80 @@
   }
 
   /**
-   * Email-specific global styles
-   * Email background color
-   */
-  body,
-  .body-wrap {
-    background-color: #d1d2d4;
-  }
-
-  /**
-   * Email frame width (use '-premailer-width').
-   * Email frame background color.
+   * table.page-wrap
+   *
+   * This element wraps the email's content block. It may be used to
+   * set the email's width and borders.
+   *
+   * Outlook 2007-10 requires "border-collapse: separate;" to
+   * render borders.
    */
   table.page-wrap {
-    -premailer-width: 566;
-    width: 566px;
-    /* border-collapse allows Outlook 2007-10 to show the border */
     border-collapse: separate;
   }
 
+
+
   /**
-   * Font styles are not inherited in Outlook 2007 and 2010.
-   * This still applies to body, but that's OK.
+   * =====================
+   * Email-specific styles
+   * =====================
+   */
+  body,
+  .body-wrap {
+    /* Email background color */
+    background-color: #fff;
+  }
+
+
+  table.page-wrap {
+    /* Email width */
+    -premailer-width: 566;
+    width: 566px;
+  }
+
+  /**
+   * Email font and color styles.
+   *
+   * Font styles are not inherited in Outlook 2007-10, so apply them
+   * to everything except <html>.
    */
   *:not(html) {
-    color: #231f20;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #000;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
     font-size: 12px;
     line-height: 16px;
     font-weight: 300;
   }
 
-  strong,
-  strong * {
-    font-weight: 600;
-  }
-
-  em,
-  em *{
-    font-style: italic;
-  }
-
   a,
   a * {
-    color: #0078C1;
+    /* Link colors */
   }
+
 
   /**
-   * Use tables for outputting text
-   *
-   * Simulate content margins with the .content td padding
+   * Unordered list bullets.
    */
-  .content td {
-    padding: 15px 0 0 0;
-  }
-
-  .content table td {
-    padding: 0;
-  }
-
-  .content table td.bull {
+  td.bull {
+    /* TODO: may require !important. */
     padding: 0 5px 0 10px;
     -premailer-width: 6;
     width: 6px;
   }
 
-  .content table td.bull,
-  .content table td.bull img {
-    line-height: 11px;
-  }
-
   /**
-   * Email-specific styles
+   * table.content
+   *
+   * Paragraph tags render inconsistently across email clients. Tables
+   * render more consistently and should be used instead.
+   *
+   * Margins are not supported in outlook.com. Use nested tables and
+   * padding to mimic margins.
    */
+  table.content td {
+    padding: 15px 0 0 0;
+  }
 </style>
 </head>
 <body offset="0">
